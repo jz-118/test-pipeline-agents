@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "test-pipeline-agents"
+version = "0.1.0"
+description = "A constrained multi-agent test maintenance CLI for Jenkins pipelines"
+requires-python = ">=3.10"
+dependencies = ["python-dotenv>=1.0,<2"]
+
+[project.scripts]
+pipeline-agent = "pipeline_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["pipeline_agent*"]
