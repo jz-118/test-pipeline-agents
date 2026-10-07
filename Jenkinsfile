@@ -1,17 +1,42 @@
 pipeline {
     agent any
-    triggers { pollSCM('H/5 * * * *') }
+
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     stages {
-        stage('Install') {
-            steps { sh 'python3 -m pip install -e .' }
-        }
-        stage('Agent test maintenance') {
+        stage('Environment') {
             steps {
-                sh 'pipeline-agent run --base-ref HEAD~1 --head-ref HEAD'
+                sh '''
+                    python3 --version
+                    python3 -m venv .venv
+                    .venv/bin/python -m pip install --upgrade pip
+                    .venv/bin/python -m pip install -e ".[test]"
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    mkdir -p reports
+                    .venv/bin/python -m pytest tests -q --junitxml=reports/junit.xml
+                '''
             }
         }
     }
+
     post {
-        always { archiveArtifacts artifacts: '.pipeline-agent/*.json', allowEmptyArchive: true }
+        always {
+            junit testResults: 'reports/junit.xml', allowEmptyResults: true
+            archiveArtifacts artifacts: 'reports/junit.xml', allowEmptyArchive: true
+        }
     }
 }

@@ -9,6 +9,9 @@ description = "A constrained multi-agent test maintenance CLI for Jenkins pipeli
 requires-python = ">=3.10"
 dependencies = ["python-dotenv>=1.0,<2"]
 
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
 [project.scripts]
 pipeline-agent = "pipeline_agent.cli:main"
 
